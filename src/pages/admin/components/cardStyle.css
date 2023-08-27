@@ -1,0 +1,21 @@
+.card {
+  display: flex;
+  width: 80vw;
+  margin: 0.5vh;
+  justify-content: space-between;
+  border-radius: 10px;
+  border: solid 1px lightgray;
+  transition: transform 2s ease, border 0.8s ease;
+}
+
+.card:hover {
+  border: solid 1px lightblue;
+}
+
+.card p {
+  padding: 0px 20px;
+}
+
+a:link {
+  text-decoration: none;
+}
