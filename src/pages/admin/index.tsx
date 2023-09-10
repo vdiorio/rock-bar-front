@@ -3,12 +3,15 @@ import CommandCard from "./components/CommandCard";
 import { Command } from "../../interfaces";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
-import { getCommands } from "../../helpers/serverCalls";
-import { errorToast } from "../../helpers/toasts";
+import { getCommands, validateRole } from "../../helpers/serverCalls";
+import { redirectAndClearStorage } from "../../helpers/redirect";
+import { useNavigate } from "react-router-dom";
+import Container from "../../helpers/Container";
 
 export default function AdminPage() {
   const [commands, setCommands] = useState<Command[] | null>(null);
   const [search, setSearch] = useState("");
+  const [isLoading, setLoading] = useState(true);
   const dataFetchedRef = useRef(false);
 
   const setSearchAndPage = ({
@@ -17,16 +20,23 @@ export default function AdminPage() {
     setSearch(value);
   };
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (dataFetchedRef.current) return;
     dataFetchedRef.current = true;
-    getCommands()
-      .then((commands) => setCommands(commands))
-      .catch(({ message }) => errorToast(message));
-  }, []);
+    validateRole("ADMIN")
+      .then(() => {
+        getCommands()
+          .then((commands) => setCommands(commands))
+          .catch(() => redirectAndClearStorage(navigate));
+      })
+      .catch(() => redirectAndClearStorage(navigate))
+      .finally(() => setLoading(false));
+  }, [navigate]);
 
   return (
-    <div className="container">
+    <Container isLoading={isLoading}>
       <input
         type="text"
         value={search}
@@ -47,6 +57,6 @@ export default function AdminPage() {
               })}
         </ListGroup>
       </Card>
-    </div>
+    </Container>
   );
 }

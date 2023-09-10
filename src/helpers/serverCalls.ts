@@ -1,7 +1,34 @@
 import { Product } from "../interfaces";
 
-export const getCommands = async () => {
-  const response = await fetch("http://localhost:3001/commands");
+const API_URL = "http://localhost:3001";
+
+const fetchWithToken = async (
+  url: string,
+  method = "GET",
+  body: any = null
+) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "/login";
+    return;
+  }
+
+  const response = await fetch(`${API_URL}${url}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: body ? JSON.stringify(body) : null,
+  });
+
+  if (response.status === 401) {
+    localStorage.clear();
+    window.location.href = "/login";
+    return;
+  }
+
   const data = await response.json();
 
   if (!response.ok) {
@@ -9,58 +36,33 @@ export const getCommands = async () => {
   }
 
   return data;
+};
+
+export const getCommands = async () => {
+  return await fetchWithToken("/commands");
 };
 
 export const getCommandsById = async (id: string) => {
-  const response = await fetch("http://localhost:3001/commands/" + id);
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message);
-  }
-
-  return data;
+  return await fetchWithToken(`/commands/${id}`);
 };
 
 export const createOrder = async (id: string, value: string) => {
-  const response = await fetch(`http://localhost:3001/orders/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json", // Specify that you're sending JSON data
-    },
-    body: JSON.stringify({
-      commandId: id,
-      value: Number(value),
-    }),
+  return await fetchWithToken("/orders", "POST", {
+    commandId: id,
+    value: Number(value),
   });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message);
-  }
-  return data;
 };
 
 export const updateCommandValue = async (id: string, value: number) => {
-  const response = await fetch(
-    `http://localhost:3001/commands/${id}?value=${value}`,
-    {
-      method: "Put",
-    }
-  );
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message);
-  }
-  return data;
+  return await fetchWithToken(`/commands/${id}?value=${value}`, "PUT");
 };
 
 export const getProductList = async () => {
-  const response = await fetch(`http://localhost:3001/products`);
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message);
+  let url = "/products";
+  if (localStorage.getItem("role") === "SELLER") {
+    url += `?sellerid=${localStorage.getItem("id")}`;
   }
-  return data;
+  return await fetchWithToken(url);
 };
 
 interface productDebit {
@@ -72,60 +74,61 @@ export const debitProductsFromCommand = async (
   commandId: string,
   products: productDebit[]
 ) => {
-  const response = await fetch(
-    `http://localhost:3001/commands/debit/${commandId}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json", // Specify that you're sending JSON data
-      },
-      body: JSON.stringify(products),
-    }
-  );
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message);
-  }
-  return data;
+  return await fetchWithToken(`/commands/debit/${commandId}`, "PUT", products);
 };
 
 export const updateProduct = async (id: number, product: Partial<Product>) => {
-  const response = await fetch(`http://localhost:3001/products/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json", // Specify that you're sending JSON data
-    },
-    body: JSON.stringify(product),
-  });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message);
-  }
-  return data;
+  return await fetchWithToken(`/products/${id}`, "PUT", product);
 };
 
 export const createProduct = async (product: Partial<Product>) => {
-  const response = await fetch(`http://localhost:3001/products`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json", // Specify that you're sending JSON data
-    },
-    body: JSON.stringify(product),
-  });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message);
-  }
-  return data;
+  return await fetchWithToken("/products", "POST", product);
 };
 
 export const deleteProduct = async (id: number) => {
-  const response = await fetch(`http://localhost:3001/products/${id}`, {
-    method: "Delete",
+  return await fetchWithToken(`/products/${id}`, "DELETE");
+};
+
+export const login = async ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => {
+  const response = await fetch(API_URL + "/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
   });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message);
+  const { token, role } = await response.json();
+  return { token, role };
+};
+
+export const validateRole = async (requiredRole: "ADMIN" | "SELLER") => {
+  const response = await fetchWithToken("/login/validate-role");
+  const { role } = response;
+  if (!(role === "ADMIN" || role === requiredRole)) {
+    throw new Error("Não autorizado");
   }
-  return data;
+  return role;
+};
+
+export const validateToken = async () => {
+  const response = await fetchWithToken("/login/validate-role");
+  return response.role;
+};
+
+export const getOrdersBySellerId = async () => {
+  return await fetchWithToken("/command-orders");
+};
+
+export const getAdminUsers = async () => {
+  return await fetchWithToken("/users/seller");
+};
+
+export const resetPassword = async (id: string, password: string) => {
+  return await fetchWithToken("/users/" + id, "PUT", { password });
 };

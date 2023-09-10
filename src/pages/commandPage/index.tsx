@@ -1,16 +1,17 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
   createOrder,
   getCommandsById,
   updateCommandValue,
+  validateRole,
 } from "../../helpers/serverCalls";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { errorToast, successToast } from "../../helpers/toasts";
 import { CommandData } from "../../interfaces";
 import { Button, Modal, Table, Form } from "react-bootstrap";
 import CurrencyMaskedInput from "react-currency-masked-input";
+import { redirectAndClearStorage } from "../../helpers/redirect";
 
 export default function CommandPage() {
   const { commandId } = useParams();
@@ -64,28 +65,37 @@ export default function CommandPage() {
     setIsEditing(false);
   };
 
+  const navigate = useNavigate();
+
   const updateCommand = async () => {
     getCommandsById(commandId!)
       .then((commands) => setCommand(commands))
-      .catch(({ message }) => errorToast(message))
-      .finally(() => console.log(command));
+      .catch(({ message }) => errorToast(message));
   };
 
   useEffect(() => {
     if (dataFetchedRef.current) return;
     dataFetchedRef.current = true;
-    updateCommand();
-  }, []);
+    validateRole("ADMIN")
+      .then(() => {
+        getCommandsById(commandId!)
+          .then((command) => setCommand(command))
+          .catch(() => redirectAndClearStorage(navigate));
+      })
+      .catch(() => redirectAndClearStorage(navigate));
+  }, [navigate, commandId]);
 
   function formatDate(stringDate: string) {
     const date = new Date(stringDate);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = String(date.getFullYear()).slice(2);
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const formattedDate = date.toLocaleString("en-US", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-    return `${day}/${month}/${year} ás ${hours}:${minutes}`;
+    return formattedDate;
   }
 
   return (
@@ -94,7 +104,7 @@ export default function CommandPage() {
         <div className="container mt-5">
           <div className="card mt-3">
             <div className="card-body">
-              <h1>Comanda : {commandId}</h1>
+              <h1 className="mb-4">Comanda: {commandId}</h1>
               {isEditing ? (
                 <Form>
                   <CurrencyMaskedInput
@@ -102,10 +112,18 @@ export default function CommandPage() {
                     className="form-control"
                     value={editedValue}
                   />
-                  <Button variant="primary" onClick={handleSaveClick}>
+                  <Button
+                    variant="primary"
+                    onClick={handleSaveClick}
+                    className="mt-3 me-2"
+                  >
                     Salvar
                   </Button>
-                  <Button variant="secondary" onClick={handleCancelClick}>
+                  <Button
+                    variant="secondary"
+                    onClick={handleCancelClick}
+                    className="mt-3"
+                  >
                     Cancelar
                   </Button>
                 </Form>
@@ -129,70 +147,68 @@ export default function CommandPage() {
                     <Modal.Title>Criar Novo Pedido</Modal.Title>
                   </Modal.Header>
                   <Modal.Body>
-                    <Form>
-                      <Form.Group controlId="orderValue">
-                        <Form.Label>Valor do Pedido</Form.Label>
-                        <CurrencyMaskedInput
-                          value={newOrderValue}
-                          onChange={(e, value) => setNewOrderValue(value)}
-                          className="form-control"
-                        />
-                      </Form.Group>
-                    </Form>
+                    <Form.Group>
+                      <Form.Label>Valor do Pedido</Form.Label>
+                      <CurrencyMaskedInput
+                        onChange={(e, value) => setNewOrderValue(value)}
+                        className="form-control"
+                        value={newOrderValue}
+                      />
+                    </Form.Group>
                   </Modal.Body>
                   <Modal.Footer>
                     <Button variant="secondary" onClick={handleCloseModal}>
                       Cancelar
                     </Button>
-                    <Button
-                      variant="primary"
-                      onClick={handleSaveOrder}
-                      disabled={Number(newOrderValue) <= 0}
-                    >
+                    <Button variant="primary" onClick={handleSaveOrder}>
                       Salvar
                     </Button>
                   </Modal.Footer>
                 </Modal>
               </h6>
-              <div style={{ maxHeight: "300px", overflowY: "auto" }}>
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Pedido</th>
-                      <th>Valor</th>
-                      <th>Data e hora</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {command.orders.map((order) => (
-                      <tr key={order.id}>
-                        <td>{order.id}</td>
-                        <td>{order.value}</td>
-                        <td>{formatDate(order.orderedAt)}</td>
+              <div className="mt-3">
+                <h6 className="mt-3">Pedidos:</h6>
+                <div style={{ overflowY: "scroll", height: "30vh" }}>
+                  <Table striped bordered hover>
+                    <thead style={{ position: "sticky" }}>
+                      <tr>
+                        <th>Valor</th>
+                        <th>Data</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                    </thead>
+                    <tbody>
+                      {command?.orders.map((order) => (
+                        <tr key={order.id}>
+                          <td>{order.value.toFixed(2)}</td>
+                          <td>{formatDate(order.orderedAt)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
               </div>
-
               <h6 className="mt-3">Retiradas:</h6>
-              <div style={{ maxHeight: "300px", overflowY: "auto" }}>
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Produto</th>
-                      <th>Quantidade</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {command.products.map((product) => (
-                      <tr key={product.orderedAt}>
-                        <td>{product.productName}</td>
-                        <td>{product.quantity}</td>
+              <div className="mt-3">
+                <div style={{ overflowY: "scroll", height: "30vh" }}>
+                  <Table striped bordered hover>
+                    <thead style={{ position: "sticky" }}>
+                      <tr>
+                        <th>Nome do Produto</th>
+                        <th>Qtd</th>
+                        <th>Data</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                    </thead>
+                    <tbody>
+                      {command?.products.map((product, index) => (
+                        <tr key={index}>
+                          <td>{product.productName}</td>
+                          <td>{product.quantity}</td>
+                          <td>{formatDate(product.orderedAt)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
               </div>
             </div>
           </div>

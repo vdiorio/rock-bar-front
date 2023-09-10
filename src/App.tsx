@@ -10,6 +10,10 @@ import "react-toastify/dist/ReactToastify.min.css";
 import SellerPage from "./pages/seller";
 import ProductPage from "./pages/products";
 import CommandPage from "./pages/commandPage";
+import LoginPage from "./pages/login";
+import RegisterPage from "./pages/register";
+import UsersPage from "./pages/users";
+import useApiMonitoring from "./helpers/useApiMonitoring";
 
 const router = createBrowserRouter([
   {
@@ -25,12 +29,24 @@ const router = createBrowserRouter([
     element: <ProductPage />,
   },
   {
+    path: "/admin/users",
+    element: <UsersPage />,
+  },
+  {
     path: "/admin",
     element: <AdminPage />,
   },
   {
     path: "/seller",
     element: <SellerPage />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
   },
   {
     path: "/",

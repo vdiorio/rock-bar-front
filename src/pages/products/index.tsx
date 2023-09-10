@@ -2,7 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { Product } from "../../interfaces";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
-import { createProduct, getProductList } from "../../helpers/serverCalls";
+import {
+  createProduct,
+  getProductList,
+  validateRole,
+} from "../../helpers/serverCalls";
 import { errorToast, successToast } from "../../helpers/toasts";
 import ProductCard from "./components/ProductCard";
 import { Button, Form } from "react-bootstrap";
@@ -37,7 +41,7 @@ export default function ProductPage() {
   useEffect(() => {
     if (dataFetchedRef.current) return;
     dataFetchedRef.current = true;
-    updateProducts();
+    validateRole("ADMIN").then(updateProducts);
   }, []);
 
   return (

@@ -32,6 +32,11 @@ export default function Header() {
               Produtos
             </a>
           </li>
+          <li className="nav-item">
+            <a className="nav-link" href="/admin/users">
+              Usuários
+            </a>
+          </li>
         </ul>
       </div>
     </nav>
