@@ -1,0 +1,9 @@
+.login-container {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-direction: column;
+  background-color: #090919;
+  height: 100vh;
+  margin: 0;
+}

@@ -1,6 +1,6 @@
-import { Product } from "../interfaces";
+import { CommandData, Product } from "../interfaces";
 
-const API_URL = "http://localhost:3001";
+const API_URL = "http://54.94.120.75";
 
 const fetchWithToken = async (
   url: string,
@@ -10,6 +10,7 @@ const fetchWithToken = async (
   const token = localStorage.getItem("token");
 
   if (!token) {
+    localStorage.clear();
     window.location.href = "/login";
     return;
   }
@@ -43,24 +44,42 @@ export const getCommands = async () => {
 };
 
 export const getCommandsById = async (id: string) => {
-  return await fetchWithToken(`/commands/${id}`);
+  const response = await fetch(`${API_URL}/commands/${id}`);
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
+  return data as CommandData;
 };
 
-export const createOrder = async (id: string, value: string) => {
+export const createOrder = async (
+  id: string,
+  value: string,
+  name: string = ""
+) => {
   return await fetchWithToken("/orders", "POST", {
     commandId: id,
     value: Number(value),
+    name,
   });
 };
 
-export const updateCommandValue = async (id: string, value: number) => {
-  return await fetchWithToken(`/commands/${id}?value=${value}`, "PUT");
-};
+export const updateCommandData = async (
+  id: string,
+  value: number,
+  name: string = ""
+) =>
+  await fetchWithToken(
+    `/commands/${id}?value=${value}&name=${name.length ? name : null}`,
+    "PUT"
+  );
 
 export const getProductList = async () => {
   let url = "/products";
   if (localStorage.getItem("role") === "SELLER") {
-    url += `?sellerid=${localStorage.getItem("id")}`;
+    url += `?sellerId=${localStorage.getItem("id")}`;
   }
   return await fetchWithToken(url);
 };
@@ -85,6 +104,10 @@ export const createProduct = async (product: Partial<Product>) => {
   return await fetchWithToken("/products", "POST", product);
 };
 
+export const createCategory = async (name: string) => {
+  return await fetchWithToken("/categories", "POST", { name });
+};
+
 export const deleteProduct = async (id: number) => {
   return await fetchWithToken(`/products/${id}`, "DELETE");
 };
@@ -103,14 +126,14 @@ export const login = async ({
     },
     body: JSON.stringify({ email, password }),
   });
-  const { token, role } = await response.json();
-  return { token, role };
+  const { token, role, id } = await response.json();
+  return { token, role, id };
 };
 
 export const validateRole = async (requiredRole: "ADMIN" | "SELLER") => {
   const response = await fetchWithToken("/login/validate-role");
   const { role } = response;
-  if (!(role === "ADMIN" || role === requiredRole)) {
+  if (!(role === "ADMIN" || role === requiredRole.toUpperCase())) {
     throw new Error("Não autorizado");
   }
   return role;
@@ -129,6 +152,18 @@ export const getAdminUsers = async () => {
   return await fetchWithToken("/users/seller");
 };
 
+export const getCategories = async () => {
+  return await fetchWithToken("/categories");
+};
+
 export const resetPassword = async (id: string, password: string) => {
   return await fetchWithToken("/users/" + id, "PUT", { password });
+};
+
+export const changeUserCategory = async (id: string, categoryId: number) => {
+  return await fetchWithToken("/users/upcat/" + id, "PUT", { categoryId });
+};
+
+export const createSeller = async (userData: any) => {
+  return await fetchWithToken("/users", "POST", userData);
 };

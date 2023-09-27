@@ -1,0 +1,32 @@
+.seller-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #090919;
+  height: 100vh;
+  margin: 0 !important;
+  color: white;
+  gap: 5%;
+}
+
+.seller-container h1 {
+  text-align: center;
+  margin: 5% 0 0 0;
+}
+
+.mt-3 h6 {
+  display: flex;
+  align-items: center;
+  gap: 10%;
+}
+
+.mt-5,
+.mt-3 {
+  margin: 0 !important;
+  padding: 1%;
+}
+
+td {
+  font-size: 20;
+  vertical-align: middle;
+  text-align: center;
+}

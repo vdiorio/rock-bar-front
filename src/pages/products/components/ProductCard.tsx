@@ -8,12 +8,16 @@ import { errorToast, successToast } from "../../../helpers/toasts";
 export default function ProductCard({
   product,
   update,
+  categories,
 }: {
   product: Product;
   update: () => void;
+  categories: { id: number; name: string }[];
 }) {
-  const { id, price, name } = product;
+  console.log(product);
+  const { id, price, name, category } = product;
   const [isEditing, setIsEditing] = useState(false);
+  const [categoryId, setCategoryId] = useState(product.categoryId);
   const [isLoading, setIsLoading] = useState(false);
   const [editedName, setEditedName] = useState(name);
   const [editedPrice, setEditedPrice] = useState(String(price.toFixed(2)));
@@ -49,7 +53,11 @@ export default function ProductCard({
 
   const handleConfirmEdit = () => {
     setIsLoading(true);
-    updateProduct(id, { name: editedName, price: Number(editedPrice) })
+    updateProduct(id, {
+      name: editedName,
+      price: Number(editedPrice),
+      categoryId,
+    })
       .then(() => {
         successToast("Produto atualizado!");
         update();
@@ -62,13 +70,11 @@ export default function ProductCard({
   };
 
   return (
-    <ListGroup.Item
-      className="d-flex justify-content-between align-items-start"
-      action
-    >
+    <ListGroup.Item className="d-flex justify-content-between align-items-start">
       {isEditing ? (
         <div className="w-100">
           <Form.Group className="mb-2">
+            <Form.Label>Nome:</Form.Label>
             <Form.Control
               type="text"
               value={editedName}
@@ -76,11 +82,25 @@ export default function ProductCard({
             />
           </Form.Group>
           <Form.Group className="mb-2">
+            <Form.Label>Preço:</Form.Label>
             <CurrencyMaskedInput
               className="form-control"
               value={editedPrice}
               onChange={(e, value) => setEditedPrice(value)}
             />
+          </Form.Group>
+          <Form.Group className="mb-2">
+            <Form.Label>Categoria:</Form.Label>
+            <Form.Select
+              value={categoryId}
+              onChange={({ target: { value } }) => setCategoryId(Number(value))}
+            >
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </Form.Select>
           </Form.Group>
           <Button
             disabled={isLoading}
@@ -111,6 +131,8 @@ export default function ProductCard({
           <div className="ms-2 me-auto">
             <div className="fw-bold">{name}</div>
             {`Preço: R$ ${String(price.toFixed(2))}`}
+            <br />
+            {`Categoria: ${category!.name}`}
           </div>
           <Button variant="outline-secondary" onClick={handleEditClick}>
             Editar

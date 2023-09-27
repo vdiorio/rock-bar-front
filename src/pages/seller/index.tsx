@@ -8,6 +8,7 @@ import {
 } from "../../helpers/serverCalls";
 import { errorToast, successToast } from "../../helpers/toasts";
 import ReactLoading from "react-loading";
+import "./sellerPage.css";
 
 interface Product {
   id: number;
@@ -107,11 +108,12 @@ export default function SellerPage() {
       {isLoading ? (
         <ReactLoading color={"black"} height={"20%"} width={"20%"} />
       ) : (
-        <div className="container mt-5">
-          <div className="card mt-3">
-            <div className="card-body">
-              <h5 className="card-title">Produtos:</h5>
-              <Table striped bordered hover variant="light">
+        <div className="container mt-5 seller-container">
+          <h1>Página de vendas</h1>
+          <div>
+            <h5 className="card-title">Produtos:</h5>
+            <div className="table-container">
+              <Table striped bordered hover variant="dark" size="sm">
                 <thead>
                   <tr>
                     <th>Nome</th>
@@ -125,13 +127,15 @@ export default function SellerPage() {
                       return (
                         <tr key={product.id}>
                           <td>{product.name}</td>
-                          <td>{`R$ ${product.price}`}</td>
+                          <td>{`R$ ${product.price.toFixed(2)}`}</td>
                           <td>
                             <div
                               style={{
                                 display: "flex",
                                 justifyContent: "space-between",
                                 alignItems: "center",
+                                verticalAlign: "middle",
+                                textAlign: "center",
                               }}
                             >
                               <Button
@@ -139,9 +143,14 @@ export default function SellerPage() {
                                   handleChangeQuantity(product.id, -1)
                                 }
                               >
-                                -
+                                \/
                               </Button>
-                              <p style={{ fontSize: 20 }}>
+                              <p
+                                style={{
+                                  fontSize: 20,
+                                  verticalAlign: "middle",
+                                }}
+                              >
                                 {productQuantity[product.id] || "0"}
                               </p>
                               <Button
@@ -149,7 +158,7 @@ export default function SellerPage() {
                                   handleChangeQuantity(product.id, 1)
                                 }
                               >
-                                +
+                                /\
                               </Button>
                             </div>
                           </td>
@@ -158,92 +167,100 @@ export default function SellerPage() {
                     })}
                 </tbody>
               </Table>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <Button
-                  onClick={toggleModal}
-                  disabled={!productQuantity.some((e) => e > 0)}
-                >
-                  Gerar Pedido
-                </Button>
-                <Button onClick={clearQtd}>Limpar tabela</Button>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <Button variant="secondary" onClick={clearQtd}>
+                Limpar tabela
+              </Button>
+              <Button
+                onClick={toggleModal}
+                disabled={!productQuantity.some((e) => e > 0)}
+                variant="success"
+              >
+                Gerar Pedido
+              </Button>
+            </div>
+          </div>
+          <Modal show={showModal} onHide={toggleModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Gerar pedidos</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <div className="table-container">
+                <Table striped bordered hover variant="dark" size="sm">
+                  <thead>
+                    <tr>
+                      <th>Produto</th>
+                      <th>Qtd</th>
+                      <th>Preço</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  {products && (
+                    <>
+                      <tbody>
+                        {products.map(({ id, name, price }, index) => {
+                          const quantity = productQuantity[id];
+                          if (quantity > 0) {
+                            return (
+                              <tr>
+                                <td>{name}</td>
+                                <td>{quantity}</td>
+                                <td>R$ {price.toFixed(2)}</td>
+                                <td>R$ {(price * quantity).toFixed(2)}</td>
+                              </tr>
+                            );
+                          }
+                        })}
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td />
+                          <td />
+                          <td style={{ fontWeight: "bold" }}>Total: </td>
+                          <td style={{ fontWeight: "bold" }}>
+                            {"R$ "}
+                            {products
+                              .reduce((acc, curr) => {
+                                if (productQuantity[curr.id] > 0) {
+                                  return (
+                                    acc + curr.price * productQuantity[curr.id]
+                                  );
+                                }
+                                return acc;
+                              }, 0)
+                              .toFixed(2)}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </>
+                  )}
+                </Table>
               </div>
-              <Modal show={showModal} onHide={toggleModal}>
-                <Modal.Header closeButton>
-                  <Modal.Title>Gerar pedidos</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                  <Table striped bordered hover variant="light">
-                    <thead>
-                      <tr>
-                        <th>Produto</th>
-                        <th>Qtd</th>
-                        <th>Preço</th>
-                        <th>Total</th>
-                      </tr>
-                    </thead>
-                    {products && (
-                      <>
-                        <tbody>
-                          {products.map(({ id, name, price }, index) => {
-                            const quantity = productQuantity[id];
-                            if (quantity > 0) {
-                              return (
-                                <tr>
-                                  <td>{name}</td>
-                                  <td>{quantity}</td>
-                                  <td>R$ {price.toFixed(2)}</td>
-                                  <td>R$ {(price * quantity).toFixed(2)}</td>
-                                </tr>
-                              );
-                            }
-                          })}
-                        </tbody>
-                        <tfoot>
-                          <tr>
-                            <td />
-                            <td />
-                            <td style={{ fontWeight: "bold" }}>Total: </td>
-                            <td style={{ fontWeight: "bold" }}>
-                              {"R$ "}
-                              {products
-                                .reduce((acc, curr) => {
-                                  if (productQuantity[curr.id] > 0) {
-                                    return (
-                                      acc +
-                                      curr.price * productQuantity[curr.id]
-                                    );
-                                  }
-                                  return acc;
-                                }, 0)
-                                .toFixed(2)}
-                            </td>
-                          </tr>
-                        </tfoot>
-                      </>
-                    )}
-                  </Table>
-                  <p>Comanda: </p>
-                  <input
-                    type="text"
-                    onChange={(e) => setCommandId(e.target.value)}
-                    value={commandId}
-                  />
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button variant="secondary" onClick={handleCancel}>
-                    Cancelar
-                  </Button>
-                  <Button
-                    disabled={!commandId.length}
-                    variant="primary"
-                    onClick={generateProductOrder}
-                  >
-                    Confirmar
-                  </Button>
-                </Modal.Footer>
-              </Modal>
-              <h6 className="mt-3">Retiradas:</h6>
-              <Table striped bordered hover variant="light">
+              <p>Comanda: </p>
+              <input
+                type="text"
+                onChange={(e) => setCommandId(e.target.value)}
+                value={commandId}
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCancel}>
+                Cancelar
+              </Button>
+              <Button
+                disabled={!commandId.length}
+                variant="primary"
+                onClick={generateProductOrder}
+              >
+                Confirmar
+              </Button>
+            </Modal.Footer>
+          </Modal>
+          <div>
+            <h6 className="mt-3">Retiradas:</h6>
+            <div className="table-container">
+              <Table striped bordered hover variant="dark" size="sm">
                 <thead>
                   <tr>
                     <th>Comanda</th>

@@ -11,7 +11,9 @@ export default function Container({ isLoading, children }: Props) {
       {isLoading ? (
         <ReactLoading color={"black"} height={"20%"} width={"20%"} />
       ) : (
-        <div className="container">{children}</div>
+        <div className="container" style={{ backgroundColor: "#090919" }}>
+          {children}
+        </div>
       )}
     </>
   );

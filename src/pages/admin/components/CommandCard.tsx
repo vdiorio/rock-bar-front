@@ -8,6 +8,7 @@ export default function CommandCard({ command }: { command: Command }) {
       className="d-flex justify-content-between align-items-start"
       action
       href={`/admin/command/${id}`}
+      style={{ borderRadius: "5px" }}
     >
       <div className="ms-2 me-auto">
         <div className="fw-bold">{`Comanda: ${id}`}</div>

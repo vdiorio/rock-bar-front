@@ -16,3 +16,8 @@ a {
   color: inherit;
   text-decoration: inherit;
 }
+
+.table-container {
+  overflow-y: "scroll";
+  height: "30vh";
+}

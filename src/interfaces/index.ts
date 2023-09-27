@@ -17,6 +17,8 @@ export interface Product {
   photo: string;
   price: number;
   stock: number;
+  categoryId: number;
+  category?: { id: number; name: string };
 }
 
 interface Order {
@@ -27,9 +29,20 @@ interface Order {
   status: string;
 }
 
+export interface ProductOrder {
+  id: number;
+  commandId: number;
+  orderedAt: string;
+  sellerId: number;
+  value: number;
+  status: "OK" | "Cancelled";
+  products: { orderId: number; productId: number; quantity: number }[];
+}
+
 export interface CommandData {
   id: number;
+  name: string;
   value: number;
   orders: Order[];
-  products: CommandProduct[];
+  productOrders: ProductOrder[];
 }

@@ -2,7 +2,6 @@ import React from "react";
 import "./App.css";
 import AdminPage from "./pages/admin";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import ErrorPage from "./errorPage";
 import Header from "./pages/admin/components/Header";
 import { ToastContainer } from "react-toastify";
 
@@ -13,7 +12,8 @@ import CommandPage from "./pages/commandPage";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import UsersPage from "./pages/users";
-import useApiMonitoring from "./helpers/useApiMonitoring";
+import Home from "./pages/Home";
+import CommandClient from "./pages/commandClient";
 
 const router = createBrowserRouter([
   {
@@ -49,8 +49,12 @@ const router = createBrowserRouter([
     element: <RegisterPage />,
   },
   {
+    path: "/command/:commandId",
+    element: <CommandClient />,
+  },
+  {
     path: "/",
-    errorElement: <ErrorPage />,
+    element: <Home />,
   },
 ]);
 

@@ -1,44 +1,43 @@
+import React, { useEffect, useState } from "react";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
+import { useNavigate } from "react-router-dom";
+import { validateRole, validateToken } from "../../../helpers/serverCalls";
+
 export default function Header() {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("role") === "ADMIN") {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
+  }, []);
+
+  const logout = () => {
+    localStorage.clear();
+  };
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a className="navbar-brand" href="/admin">
-        Estação Eskina Rock Bar
-      </a>
-      <button
-        className="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarText"
-        aria-controls="navbarText"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span className="navbar-toggler-icon"></span>
-      </button>
-      <div className="collapse navbar-collapse" id="navbarText">
-        <ul className="navbar-nav mr-auto">
-          <li className="nav-item">
-            <a className="nav-link" href="/admin">
-              Comandas
-            </a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link" href="/admin/orders">
-              Pedidos
-            </a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link" href="/admin/products">
-              Produtos
-            </a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link" href="/admin/users">
-              Usuários
-            </a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+    <Navbar bg="dark" variant="dark" expand="lg">
+      <Navbar.Brand href="/admin">Estação Eskina Rock Bar</Navbar.Brand>
+      <Navbar.Toggle aria-controls="navbarText" />
+      <Navbar.Collapse id="navbarText">
+        <Nav className="mr-auto">
+          {isAdmin && (
+            <>
+              <Nav.Link href="/admin">Comandas</Nav.Link>
+              <Nav.Link href="/admin/orders">Pedidos</Nav.Link>
+              <Nav.Link href="/admin/products">Produtos</Nav.Link>
+              <Nav.Link href="/admin/users">Usuários</Nav.Link>
+            </>
+          )}
+          <Nav.Link onClick={logout} href="/login" style={{ float: "right" }}>
+            Logout
+          </Nav.Link>
+        </Nav>
+      </Navbar.Collapse>
+    </Navbar>
   );
 }
