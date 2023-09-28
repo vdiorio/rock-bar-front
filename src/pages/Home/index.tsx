@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Table } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import { getCommandsById } from "../../helpers/serverCalls";
 import { errorToast } from "../../helpers/toasts";
 import { CommandData } from "../../interfaces";

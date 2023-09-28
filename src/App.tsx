@@ -13,7 +13,6 @@ import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import UsersPage from "./pages/users";
 import Home from "./pages/Home";
-import CommandClient from "./pages/commandClient";
 
 const router = createBrowserRouter([
   {
@@ -47,10 +46,6 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <RegisterPage />,
-  },
-  {
-    path: "/command/:commandId",
-    element: <CommandClient />,
   },
   {
     path: "/",

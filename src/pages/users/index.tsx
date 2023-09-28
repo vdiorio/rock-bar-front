@@ -60,7 +60,6 @@ export default function UsersPage() {
 
   const loadData = () => {
     getAdminUsers().then((userData) => {
-      console.log(userData);
       setUsers(userData);
     });
     getCategories().then((cat) => setCategories(cat));
