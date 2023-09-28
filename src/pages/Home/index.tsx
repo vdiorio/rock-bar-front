@@ -72,9 +72,6 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      <Button href="/login" className="login-link">
-        Log in
-      </Button>
       <img
         className="logo"
         src={require("../../fotos/LOGO.png")}
