@@ -1,6 +1,6 @@
 import { CommandData, Product } from "../interfaces";
 
-const API_URL = "http://54.94.120.75";
+const API_URL = "https://eskinarockbarapi.hopto.org";
 
 const fetchWithToken = async (
   url: string,
