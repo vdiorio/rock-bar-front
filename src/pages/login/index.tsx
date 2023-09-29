@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { login, validateToken } from "../../helpers/serverCalls";
+import { login } from "../../helpers/serverCalls";
 import { useNavigate } from "react-router-dom";
 import { errorToast } from "../../helpers/toasts";
 import "./loginStyles.css";

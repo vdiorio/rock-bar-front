@@ -5,6 +5,9 @@ import { getCommandsById } from "../../helpers/serverCalls";
 import { errorToast } from "../../helpers/toasts";
 import { CommandData } from "../../interfaces";
 import "./homepage.css";
+import PixModal from "./Components/PixModal";
+import PixInfoModal from "./Components/PixInfoModal";
+import formatDate from "../../helpers/formatDate";
 
 export default function Home() {
   const [transactions, setTransactions] = useState<
@@ -18,13 +21,16 @@ export default function Home() {
     | null
   >(null);
   const [command, setCommand] = useState<CommandData | null>(null);
+  const [show, setShow] = useState(false);
+  const [pixOrder, setPixOrder] = useState<number | null>(null);
   const queryParams = new URLSearchParams(window.location.search);
   const commandId = queryParams.get("q");
   const navigate = useNavigate();
 
   const fourDigitId = (id: number) => String(id).padStart(4, "0");
 
-  useEffect(() => {
+  const refreshCommand = async () => {
+    console.log(commandId);
     if (commandId) {
       getCommandsById(commandId)
         .then((com) => {
@@ -35,17 +41,16 @@ export default function Home() {
               value: o.value,
               type: "recarga",
               date: o.orderedAt,
-              status: "OK",
+              status: o.status,
             };
           });
           const retiradas = com.productOrders.map((o) => {
-            const status = o.status === "OK" ? "OK" : "Cancelado";
             return {
               id: o.id,
               type: "retirada",
               value: o.value,
               date: o.orderedAt,
-              status,
+              status: o.status,
             };
           });
           const tr = [...retiradas, ...recargas].sort((b, a) =>
@@ -58,16 +63,21 @@ export default function Home() {
           navigate("/");
         });
     }
-  }, [commandId, navigate]);
+  };
 
-  function formatDateString(inputString: string) {
-    const inputDate = new Date(inputString);
-    const day = inputDate.getDate().toString().padStart(2, "0");
-    const month = (inputDate.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-based
-    const hours = inputDate.getHours().toString().padStart(2, "0");
-    const minutes = inputDate.getMinutes().toString().padStart(2, "0");
+  useEffect(() => {
+    refreshCommand();
+  }, []);
 
-    return `${day}/${month} ${hours}:${minutes}`;
+  function statusTraslate(status: string) {
+    switch (status) {
+      case "PENDING":
+        return "Pendente";
+      case "CANCELLED":
+        return "Cancelado";
+      default:
+        return "OK";
+    }
   }
 
   return (
@@ -93,47 +103,76 @@ export default function Home() {
             <img className="pix" src={require("./pix.png")} alt="Logo do pix" />
             <br />
             <h1>
-              Evite filas,
+              Evite filas!
               <br />
-              Recarregue sua comanda com PIX!
+              Recarregue sua comanda com PIX
             </h1>
-            <Button>Clique aqui!</Button>
+            <Button onClick={() => setShow(true)}>Clique aqui!</Button>
           </div>
+          <PixModal
+            show={show}
+            onHide={() => {
+              setShow(false);
+              refreshCommand();
+            }}
+            commandId={commandId}
+          />
+          {pixOrder && (
+            <PixInfoModal
+              orderId={pixOrder}
+              onHide={() => {
+                setPixOrder(null);
+                refreshCommand();
+              }}
+            />
+          )}
         </>
       )}
       <></>
       {transactions && (
-        <Table striped bordered hover variant="dark">
-          <thead>
-            <tr>
-              <td>ID</td>
-              <td>Valor</td>
-              <td>Data</td>
-              <td>Status</td>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((tr) => {
-              const isDebit = tr.type === "retirada";
-              const color = isDebit ? "red" : "lime";
-              const minusSign = isDebit ? "-" : "";
-              const textDecoration =
-                tr.status === "OK" ? "none" : "line-through";
-              return (
-                <tr key={tr.id}>
-                  <td style={{ textDecoration }}>{tr.id}</td>
-                  <td style={{ color, textDecoration }}>
-                    {minusSign}R$ {tr.value.toFixed(2)}
-                  </td>
-                  <td style={{ textDecoration }}>
-                    {formatDateString(tr.date)}
-                  </td>
-                  <td style={{ textDecoration }}>{tr.status}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
+        <>
+          <h1>Transações</h1>
+          <Table striped bordered hover variant="dark">
+            <thead>
+              <tr>
+                <td>ID</td>
+                <td>Valor</td>
+                <td>Data</td>
+                <td>Status</td>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.map((tr) => {
+                const isDebit = tr.type === "retirada";
+                const isPending = tr.status === "PENDING";
+                let color = "lime";
+                if (isDebit) color = "red";
+                if (isPending) color = "orange";
+                const minusSign = isDebit ? "-" : "";
+                const textDecoration =
+                  tr.status === "CANCELLED" ? "line-through" : "none";
+                return (
+                  <tr
+                    key={tr.id}
+                    style={{
+                      cursor: isPending ? "pointer" : "auto",
+                    }}
+                    onClick={isPending ? () => setPixOrder(tr.id) : () => {}}
+                  >
+                    <td style={{ textDecoration }}>{tr.id}</td>
+                    <td style={{ color, textDecoration }}>
+                      {minusSign}R$ {tr.value.toFixed(2)}
+                    </td>
+                    <td style={{ textDecoration }}>{formatDate(tr.date)}</td>
+                    <td style={{ textDecoration }}>
+                      {statusTraslate(tr.status)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </>
       )}
     </div>
   );
