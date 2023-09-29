@@ -13,6 +13,7 @@ import { Button, Modal, Table, Form } from "react-bootstrap";
 import CurrencyMaskedInput from "react-currency-masked-input";
 import { redirectAndClearStorage } from "../../helpers/redirect";
 import "./commandPage.css";
+import Header from "../admin/components/Header";
 
 export default function CommandPage() {
   const { commandId } = useParams();
@@ -110,6 +111,7 @@ export default function CommandPage() {
 
   return (
     <>
+      <Header />
       {command && (
         <div className="mt-5 command-container">
           <h1 className="mb-4">Comanda: {commandId}</h1>
@@ -222,7 +224,7 @@ export default function CommandPage() {
                     <tr key={index}>
                       <td>{order.id}</td>
                       <td>{order.sellerId}</td>
-                      <td>{order.value}</td>
+                      <td>{order.value.toFixed(2)}</td>
                       <td>{formatDate(order.orderedAt)}</td>
                     </tr>
                   ))}

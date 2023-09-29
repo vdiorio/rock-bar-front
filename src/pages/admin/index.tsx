@@ -14,6 +14,7 @@ import Container from "../../helpers/Container";
 import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import CurrencyMaskedInput from "react-currency-masked-input";
 import { errorToast, successToast } from "../../helpers/toasts";
+import Header from "./components/Header";
 
 export default function AdminPage() {
   const [commands, setCommands] = useState<Command[] | null>(null);
@@ -79,94 +80,97 @@ export default function AdminPage() {
   };
 
   return (
-    <Container isLoading={isLoading}>
-      <div id="reader" />
-      <Form.Control
-        type="text"
-        value={search}
-        onChange={setSearchAndPage}
-        placeholder="Filtrar Comandas"
-      />
-      <Button onClick={() => setIsCreatingOrder(true)}>Criar Pedido</Button>
-      <Card
-        className="container"
-        style={{
-          height: "80vh",
-          overflowX: "hidden",
-          overflowY: "scroll",
-          backgroundColor: "#090919",
-        }}
-      >
-        <ListGroup style={{ gap: "2px" }}>
-          {commands &&
-            commands!
-              .filter((c) => {
-                return String(c.id).startsWith(search);
-              })
-              .map((command) => {
-                return <CommandCard command={command} />;
-              })}
-        </ListGroup>
-      </Card>
-      <Modal show={isCreatingOrder} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Criar Novo Pedido</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Group>
-            <Form.Label>Id da comanda</Form.Label>
-            <Form.Control
-              onChange={({ target: { value } }) => setCommandId(value)}
-            />
-            <Form.Label>Nome de extorno</Form.Label>
-            <div>
-              <Form.Check
-                type="radio"
-                label="Inalterado"
-                id="radioInalterado"
-                name="radioOption"
-                value="inalterado"
-                checked={commandId !== "outraOpcao"}
-                onChange={({ target: { value } }) => handleRadioChange(value)}
+    <>
+      <Header />
+      <Container isLoading={isLoading}>
+        <div id="reader" />
+        <Form.Control
+          type="text"
+          value={search}
+          onChange={setSearchAndPage}
+          placeholder="Filtrar Comandas"
+        />
+        <Button onClick={() => setIsCreatingOrder(true)}>Criar Pedido</Button>
+        <Card
+          className="container"
+          style={{
+            height: "80vh",
+            overflowX: "hidden",
+            overflowY: "scroll",
+            backgroundColor: "#090919",
+          }}
+        >
+          <ListGroup style={{ gap: "2px" }}>
+            {commands &&
+              commands!
+                .filter((c) => {
+                  return String(c.id).startsWith(search);
+                })
+                .map((command) => {
+                  return <CommandCard command={command} />;
+                })}
+          </ListGroup>
+        </Card>
+        <Modal show={isCreatingOrder} onHide={handleCloseModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Criar Novo Pedido</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Group>
+              <Form.Label>Id da comanda</Form.Label>
+              <Form.Control
+                onChange={({ target: { value } }) => setCommandId(value)}
               />
-              <Form.Check
-                type="radio"
-                label="Novo nome"
-                id="radioOutraOpcao"
-                name="radioOption"
-                value="outraOpcao"
-                checked={commandId === "outraOpcao"}
-                onChange={({ target: { value } }) => handleRadioChange(value)}
-              />
-            </div>
-            {commandId === "outraOpcao" && (
-              <InputGroup className="mb-3">
-                <Form.Control
-                  placeholder="Digite um nome personalizado"
-                  value={commandName}
-                  onChange={({ target: { value } }) =>
-                    handleCustomNameChange(value)
-                  }
+              <Form.Label>Nome de extorno</Form.Label>
+              <div>
+                <Form.Check
+                  type="radio"
+                  label="Inalterado"
+                  id="radioInalterado"
+                  name="radioOption"
+                  value="inalterado"
+                  checked={commandId !== "outraOpcao"}
+                  onChange={({ target: { value } }) => handleRadioChange(value)}
                 />
-              </InputGroup>
-            )}
-            <Form.Label>Valor do Pedido</Form.Label>
-            <CurrencyMaskedInput
-              onChange={(e, value) => setNewOrderValue(value)}
-              className="form-control"
-              value={newOrderValue}
-            />
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={handleSaveOrder}>
-            Salvar
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+                <Form.Check
+                  type="radio"
+                  label="Novo nome"
+                  id="radioOutraOpcao"
+                  name="radioOption"
+                  value="outraOpcao"
+                  checked={commandId === "outraOpcao"}
+                  onChange={({ target: { value } }) => handleRadioChange(value)}
+                />
+              </div>
+              {commandId === "outraOpcao" && (
+                <InputGroup className="mb-3">
+                  <Form.Control
+                    placeholder="Digite um nome personalizado"
+                    value={commandName}
+                    onChange={({ target: { value } }) =>
+                      handleCustomNameChange(value)
+                    }
+                  />
+                </InputGroup>
+              )}
+              <Form.Label>Valor do Pedido</Form.Label>
+              <CurrencyMaskedInput
+                onChange={(e, value) => setNewOrderValue(value)}
+                className="form-control"
+                value={newOrderValue}
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Cancelar
+            </Button>
+            <Button variant="primary" onClick={handleSaveOrder}>
+              Salvar
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </Container>
+    </>
   );
 }

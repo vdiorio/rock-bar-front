@@ -9,6 +9,7 @@ import {
 import { errorToast, successToast } from "../../helpers/toasts";
 import ReactLoading from "react-loading";
 import "./sellerPage.css";
+import Header from "../admin/components/Header";
 
 interface Product {
   id: number;
@@ -105,6 +106,7 @@ export default function SellerPage() {
 
   return (
     <>
+      <Header />
       {isLoading ? (
         <ReactLoading color={"black"} height={"20%"} width={"20%"} />
       ) : (

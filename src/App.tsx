@@ -56,7 +56,6 @@ const router = createBrowserRouter([
 function App() {
   return (
     <React.StrictMode>
-      <Header />
       <RouterProvider router={router} />
       <ToastContainer />
     </React.StrictMode>

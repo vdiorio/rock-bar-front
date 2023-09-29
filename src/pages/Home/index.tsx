@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table } from "react-bootstrap";
+import { Button, Table } from "react-bootstrap";
 import { getCommandsById } from "../../helpers/serverCalls";
 import { errorToast } from "../../helpers/toasts";
 import { CommandData } from "../../interfaces";
@@ -19,7 +19,7 @@ export default function Home() {
   >(null);
   const [command, setCommand] = useState<CommandData | null>(null);
   const queryParams = new URLSearchParams(window.location.search);
-  const commandId = queryParams.get("id");
+  const commandId = queryParams.get("q");
   const navigate = useNavigate();
 
   const fourDigitId = (id: number) => String(id).padStart(4, "0");
@@ -89,8 +89,19 @@ export default function Home() {
               2
             )}`}</h2>
           </div>
+          <div className="pix-container">
+            <img className="pix" src={require("./pix.png")} alt="Logo do pix" />
+            <br />
+            <h1>
+              Evite filas,
+              <br />
+              Recarregue sua comanda com PIX!
+            </h1>
+            <Button>Clique aqui!</Button>
+          </div>
         </>
       )}
+      <></>
       {transactions && (
         <Table striped bordered hover variant="dark">
           <thead>

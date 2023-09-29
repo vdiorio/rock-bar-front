@@ -62,3 +62,46 @@
 .data-set p {
   margin: 1px;
 }
+
+.pix-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  margin: 20px;
+  border-radius: 10px;
+  border: solid 5px #26c891;
+  background-color: #282c30;
+}
+
+/* Style the heading text */
+h1 {
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 20px; /* Add spacing between the heading and button */
+  align-items: center;
+  color: #c1c1c1;
+}
+
+/* Style the PIX logo */
+.pix {
+  width: 100px; /* Adjust the width as needed */
+  height: auto; /* Maintain the aspect ratio */
+}
+
+/* Style the "Recarregue com PIX" button */
+.pix-container button {
+  background-color: #26c891; /* Set your desired button background color */
+  color: #fff; /* Set the text color */
+  padding: 10px 20px; /* Adjust padding as needed */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Add a smooth transition */
+}
+
+/* Change button styles on hover */
+.pix-container button:hover {
+  background-color: #0056b3; /* Set the hover background color */
+}
