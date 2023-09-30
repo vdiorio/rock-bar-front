@@ -6,7 +6,7 @@ import { errorToast } from "../../../helpers/toasts";
 
 interface Props {
   show: boolean;
-  onHide: (id: number) => void;
+  onHide: (id: number | null = null) => void;
   commandId: string | null;
 }
 
