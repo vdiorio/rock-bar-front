@@ -30,7 +30,6 @@ export default function Home() {
   const fourDigitId = (id: number) => String(id).padStart(4, "0");
 
   const refreshCommand = async () => {
-    console.log(commandId);
     if (commandId) {
       getCommandsById(commandId)
         .then((com) => {
