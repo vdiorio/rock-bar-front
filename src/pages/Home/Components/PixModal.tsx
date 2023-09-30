@@ -6,11 +6,12 @@ import { errorToast } from "../../../helpers/toasts";
 
 interface Props {
   show: boolean;
-  onHide: (id: number | null) => void;
+  onHide: () => void;
   commandId: string | null;
+  setPixOrder: (orderId: number) => void
 }
 
-const PixModal = ({ show, onHide, commandId }: Props) => {
+const PixModal = ({ show, onHide, commandId, setPixOrder }: Props) => {
   const [reloadAmount, setReloadAmount] = useState("");
   const [isLoading, setLoading] = useState(false);
 
@@ -23,7 +24,10 @@ const PixModal = ({ show, onHide, commandId }: Props) => {
   const handleConfirmClick = () => {
     setLoading(true);
     createPendingOrder(Number(commandId), Number(reloadAmount))
-      .then((o: any) => onHide(o.id))
+      .then((o: any) => {
+        setPixOrder(o.id)
+        onHide()
+      })
       .catch((e) => errorToast(e.message))
       .finally(() => setLoading(false));
   };
