@@ -29,7 +29,7 @@ const PixModal = ({ show, onHide, commandId }: Props) => {
   };
 
   return (
-    <Modal show={show} onHide={onHide}>
+    <Modal show={show} onHide={onHide as () => void}>
       <Modal.Header closeButton>
         <Modal.Title>Recarregando a comanda {commandId}</Modal.Title>
       </Modal.Header>
