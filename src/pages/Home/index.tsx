@@ -111,9 +111,10 @@ export default function Home() {
           </div>
           <PixModal
             show={show}
-            onHide={() => {
+            onHide={(orderId: number) => {
               setShow(false);
               refreshCommand();
+              setPixOrder(orderId)
             }}
             commandId={commandId}
           />

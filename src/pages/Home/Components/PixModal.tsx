@@ -23,8 +23,8 @@ const PixModal = ({ show, onHide, commandId }: Props) => {
   const handleConfirmClick = () => {
     setLoading(true);
     createPendingOrder(Number(commandId), Number(reloadAmount))
+      .then((o: any) => onHide(o.id))
       .catch((e) => errorToast(e.message))
-      .then(() => onHide())
       .finally(() => setLoading(false));
   };
 

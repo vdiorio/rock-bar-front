@@ -186,13 +186,21 @@ export const getPendingOrder = async (orderId: number) => {
 
 export const createPendingOrder = async (commandId: number, value: number) => {
   const body = { commandId, value };
-  return fetch(`${API_URL}/orders/pending/`, {
+  const response = await fetch(`${API_URL}/orders/pending/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
-  }).catch((e) => console.log(e));
+  }) 
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
+  return data;
 };
 
 export const confirmOrder = async (orderId: number) => {
