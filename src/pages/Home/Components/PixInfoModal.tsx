@@ -29,7 +29,7 @@ const PixInfoModal = ({ orderId, onHide }: Props) => {
   const getPixInfo = async (commandId: number, value: number) => {
     const p = QrCodePix({
       version: "01",
-      key: "11971233100", //or any PIX key
+      key: "+5511971233100", //or any PIX key
       name: "Vitor Diorio",
       city: "SERRA AZUL",
       transactionId: String(orderId), //max 25 characters
