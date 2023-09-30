@@ -18,12 +18,17 @@ const PixInfoModal = ({ orderId, onHide }: Props) => {
   });
 
   useEffect(() => {
-    getPendingOrder(orderId).then((order) => {
-      getPixInfo(order!.commandId, order!.value).then((r) => {
-        setPix(r);
-        setLoading(false);
+    getPendingOrder(orderId)
+      .then((order) => {
+        getPixInfo(order!.commandId, order!.value).then((r) => {
+          setPix(r);
+          setLoading(false);
+        });
+      })
+      .catch(() => {
+        successToast("Pagamento confirmado");
+        onHide();
       });
-    });
   }, []);
 
   const getPixInfo = async (commandId: number, value: number) => {
