@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
-import { useNavigate } from "react-router-dom";
-import { validateRole, validateToken } from "../../../helpers/serverCalls";
 
 export default function Header() {
   const [isAdmin, setIsAdmin] = useState(false);

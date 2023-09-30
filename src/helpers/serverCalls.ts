@@ -167,3 +167,42 @@ export const changeUserCategory = async (id: string, categoryId: number) => {
 export const createSeller = async (userData: any) => {
   return await fetchWithToken("/users", "POST", userData);
 };
+
+export const getPendingOrder = async (orderId: number) => {
+  const response = await fetch(`${API_URL}/orders/pending/${orderId}`);
+
+  if (response.status === 401) {
+    localStorage.clear();
+    window.location.href = "/login";
+    return;
+  }
+
+  const data = await response.json();
+  return data as {
+    commandId: number;
+    value: number;
+  };
+};
+
+export const createPendingOrder = async (commandId: number, value: number) => {
+  const body = { commandId, value };
+  return fetch(`${API_URL}/orders/pending/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  }).catch((e) => console.log(e));
+};
+
+export const confirmOrder = async (orderId: number) => {
+  return fetchWithToken(`/orders/pending/${orderId}`, "PUT");
+};
+
+export const cancelOrder = async (orderId: number) => {
+  return fetchWithToken(`/orders/${orderId}`, "PUT");
+};
+
+export const getOrders = async () => {
+  return fetchWithToken("/orders");
+};

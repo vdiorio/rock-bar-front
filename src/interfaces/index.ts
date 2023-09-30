@@ -21,7 +21,7 @@ export interface Product {
   category?: { id: number; name: string };
 }
 
-interface Order {
+export interface Order {
   id: number;
   commandId: number;
   value: number;

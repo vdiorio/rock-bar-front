@@ -2,7 +2,6 @@ import React from "react";
 import "./App.css";
 import AdminPage from "./pages/admin";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Header from "./pages/admin/components/Header";
 import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.min.css";
@@ -13,6 +12,7 @@ import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import UsersPage from "./pages/users";
 import Home from "./pages/Home";
+import OrdersPage from "./pages/orders";
 
 const router = createBrowserRouter([
   {
@@ -25,7 +25,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin/orders",
-    element: <ProductPage />,
+    element: <OrdersPage />,
   },
   {
     path: "/admin/users",
