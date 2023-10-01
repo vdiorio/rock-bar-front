@@ -34,10 +34,10 @@ const PixInfoModal = ({ orderId, onHide }: Props) => {
   const getPixInfo = async (commandId: number, value: number) => {
     const p = QrCodePix({
       version: "01",
-      key: "+5511971233100", //or any PIX key
-      name: "Vitor Diorio",
-      city: "SERRA AZUL",
-      transactionId: String(orderId), //max 25 characters
+      key: "+5511971233100",
+      name: "Vitor Martins Diorio",
+      city: "Cajamar",
+      transactionId: `ERB${orderId}`, //max 25 characters
       message: `Recarga comanda ${commandId}`,
       cep: "14230000",
       value,
